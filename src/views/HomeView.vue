@@ -1,8 +1,7 @@
-<script setup>
-</script>
+<script setup></script>
 
 <template>
   <main>
-    <h1>hello</h1>
+    <h1 class="text-red-500">hello</h1>
   </main>
 </template>

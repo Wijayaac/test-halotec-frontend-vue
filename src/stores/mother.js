@@ -1,45 +1,41 @@
 import { defineStore } from "pinia";
 import axios from "axios";
 
-export const useBabyStore = defineStore({
-  id: "baby",
+export const useMotherStore = defineStore({
+  id: "mother",
   state: () => ({
-    babies: [],
-    baby: null,
-    meta: {},
+    mothers: [],
+    mother: null,
     loading: false,
-    message: null,
     error: null,
   }),
   actions: {
-    async fetchBabies() {
-      this.babies = [];
+    async fetchMothers() {
+      this.mothers = [];
       this.loading = true;
 
       try {
         const { data } = await axios.get(
-          `${import.meta.env.VITE_API_URL}/babies`
+          `${import.meta.env.VITE_API_URL}/mothers`
         );
-        this.babies = data.babies;
-        this.meta = data.meta;
+        this.mothers = data.mothers;
       } catch (error) {
         this.error = error;
       } finally {
         this.loading = false;
       }
     },
-    async addBaby(formBody) {
+    async addMother(bodyForm) {
       this.loading = true;
 
       try {
-        await axios.post(`${import.meta.env.VITE_API_URL}/babies`, formBody, {
+        await axios.post(`${import.meta.env.VITE_API_URL}/mothers`, bodyForm, {
           headers: {
             "Content-Type": "application/json",
           },
         });
       } catch (error) {
-        this.message = error.response.data.message;
-        this.error = error.response.data.errors;
+        this.error = error;
       } finally {
         this.loading = false;
       }
