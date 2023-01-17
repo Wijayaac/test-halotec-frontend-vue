@@ -1,5 +1,6 @@
 <template>
   <main>
+    <p v-if="store.loading">...Loading Form</p>
     <div class="max-w-2xl ml-4">
       <form @submit.prevent="handleSubmit">
         <div class="mb-6">
@@ -37,8 +38,15 @@ import { useMotherStore } from "@/stores/mother";
 
 const route = useRoute();
 const store = useMotherStore();
+const motherId = route.params.id;
+store.fetchMother(motherId);
 
-store.fetchMother(route.params.id);
+function handleSubmit() {
+  const data = {
+    name: store.mother.name,
+  };
+  store.updateMother(motherId, data);
+}
 </script>
 
 <style scoped></style>

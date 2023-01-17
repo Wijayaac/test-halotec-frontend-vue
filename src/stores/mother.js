@@ -1,7 +1,8 @@
 import { defineStore } from "pinia";
 import axios from "axios";
 
-export const useMotherStore = defineStore("mother", {
+export const useMotherStore = defineStore({
+  id: "mother",
   state: () => ({
     mothers: [],
     mother: null,
@@ -62,6 +63,37 @@ export const useMotherStore = defineStore("mother", {
             "Content-Type": "application/json",
           },
         });
+      } catch (error) {
+        this.error = error;
+      } finally {
+        this.loading = false;
+      }
+    },
+    updateMother: async function (motherId, bodyForm) {
+      this.loading = true;
+
+      try {
+        await axios.put(
+          `${import.meta.env.VITE_API_URL}/mothers/${motherId}`,
+          bodyForm,
+          {
+            headers: {
+              "Content-Type": "aplication/json",
+            },
+          }
+        );
+      } catch (error) {
+        this.error = error;
+      } finally {
+        this.loading = false;
+      }
+    },
+    deleteMother: async function (motherId) {
+      this.loading = true;
+      try {
+        await axios.delete(
+          `${import.meta.env.VITE_API_URL}/mothers/${motherId}`
+        );
       } catch (error) {
         this.error = error;
       } finally {

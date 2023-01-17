@@ -3,8 +3,10 @@
     <p v-if="loading">Loading mothers ...</p>
     <p v-if="error">{{ error.message }}</p>
     <div class="action">
-      <button @click="handleDetail()">Edit</button>
+      <button class="mx-4" @click="handleDetail">Edit Selected</button>
+      <button class="mx-4" @click="handleDelete">Delete Selected</button>
     </div>
+    <pre></pre>
     <DataTable
       :data="mothers"
       :columns="columns"
@@ -50,12 +52,11 @@ import { useRouter } from "vue-router";
 import { useMotherStore } from "@/stores/mother";
 
 const router = useRouter();
-const { fetchMothers } = useMotherStore();
+const { fetchMothers, deleteMother } = useMotherStore();
 const { loading, mothers, error, meta } = storeToRefs(useMotherStore());
 
 let dt;
 const table = ref();
-const data = ref([]);
 
 const columns = [
   {
@@ -76,13 +77,22 @@ DataTable.use(DataTablesLib);
 
 onMounted(() => {
   dt = table.value.dt();
-  data.value.push(mothers);
   fetchMothers();
 });
 
 function handleDetail() {
   const target = dt.rows({ selected: true }).data()[0].id;
   router.push(`/mother/${target}`);
+}
+
+function handleDelete() {
+  const target = dt.rows({ selected: true }).data()[0];
+  const { id, name } = target;
+
+  let isConfirmed = window.confirm(`Are you sure want to delete ${name}`);
+  if (isConfirmed) {
+    deleteMother(id);
+  }
 }
 
 function handlePagination(page) {
