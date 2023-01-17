@@ -29,6 +29,11 @@ const router = createRouter({
       name: "add mother",
       component: () => import("../views/AddMotherView.vue"),
     },
+    {
+      path: "/mother/:id",
+      name: "detail mother",
+      component: () => import("../views/DetailMotherView.vue"),
+    },
   ],
 });
 

@@ -241,10 +241,14 @@ export default {
     };
   },
   methods: {
-    handleSubmit() {
+    handleValidation() {
       if (this.name !== "") {
         this.errors.push("Nama wajib diisi");
       }
+
+      return this.errors.length <= 0;
+    },
+    handleSubmit() {
       const data = {
         name: this.name,
         gestational_age: this.gestationalAge,

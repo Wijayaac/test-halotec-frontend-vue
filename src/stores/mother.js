@@ -1,31 +1,59 @@
 import { defineStore } from "pinia";
 import axios from "axios";
 
-export const useMotherStore = defineStore({
-  id: "mother",
+export const useMotherStore = defineStore("mother", {
   state: () => ({
     mothers: [],
     mother: null,
     loading: false,
     error: null,
+    meta: {
+      currentPage: 1,
+      total: 0,
+      perPage: 0,
+    },
   }),
   actions: {
-    async fetchMothers() {
+    fetchMothers: async function (currentPage = 1) {
       this.mothers = [];
+      this.meta = {
+        total: 0,
+        currentPage: currentPage,
+      };
       this.loading = true;
 
       try {
         const { data } = await axios.get(
-          `${import.meta.env.VITE_API_URL}/mothers`
+          `${import.meta.env.VITE_API_URL}/mothers?page=${currentPage}`
         );
-        this.mothers = data.mothers;
+        this.mothers = data.mothers.data;
+        this.meta = {
+          currentPage: data.mothers.current_page,
+          total: data.mothers.total,
+          pages: Math.ceil(data.mothers.total / data.mothers.per_page),
+        };
       } catch (error) {
         this.error = error;
       } finally {
         this.loading = false;
       }
     },
-    async addMother(bodyForm) {
+    fetchMother: async function (motherId) {
+      this.loading = true;
+      this.mother = null;
+
+      try {
+        const { data } = await axios.get(
+          `${import.meta.env.VITE_API_URL}/mothers/${motherId}`
+        );
+        this.mother = data.data;
+      } catch (error) {
+        this.error = error;
+      } finally {
+        this.loading = false;
+      }
+    },
+    addMother: async function (bodyForm) {
       this.loading = true;
 
       try {
