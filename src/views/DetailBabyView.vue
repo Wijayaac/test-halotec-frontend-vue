@@ -12,7 +12,8 @@
           <input
             type="text"
             id="name"
-            v-model="name"
+            v-if="store.baby"
+            v-model="store.baby.name"
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             placeholder="Contoh. Winarni"
             required
@@ -31,9 +32,10 @@
             max="10"
             step="1"
             id="gestationalAge"
-            v-model="gestationalAge"
+            v-if="store.baby"
+            v-model="store.baby.gestational_age"
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            placeholder="Contoh. Winarni"
+            placeholder="Contoh. 9"
             required
           />
         </div>
@@ -50,9 +52,10 @@
             max="100"
             step="1"
             id="motherAge"
-            v-model="motherAge"
+            v-if="store.baby"
+            v-model="store.baby.mother_age"
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            placeholder="Contoh. Winarni"
+            placeholder="Contoh. 29"
             required
           />
         </div>
@@ -69,7 +72,8 @@
             max="50"
             step="0.1"
             id="length"
-            v-model="length"
+            v-if="store.baby"
+            v-model="store.baby.length"
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             placeholder="40"
             required
@@ -87,7 +91,8 @@
             min="0"
             max="10000"
             id="weight"
-            v-model="weight"
+            v-if="store.baby"
+            v-model="store.baby.weight"
             step="0.1"
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             placeholder="2569"
@@ -102,7 +107,8 @@
           >
           <select
             id="motherId"
-            v-model="motherId"
+            v-if="store.baby"
+            v-model="store.baby.mother_id"
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             :disabled="mothers.length < 1"
           >
@@ -124,7 +130,8 @@
           >
           <select
             id="gender"
-            v-model="gender"
+            v-if="store.baby"
+            v-model="store.baby.gender"
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           >
             <option value="Laki laki" selected>Laki - laki</option>
@@ -139,7 +146,8 @@
           >
           <select
             id="parturition"
-            v-model="parturition"
+            v-if="store.baby"
+            v-model="store.baby.parturition"
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           >
             <option value="Normal" selected>Normal</option>
@@ -156,7 +164,8 @@
           >
           <select
             id="condition"
-            v-model="condition"
+            v-if="store.baby"
+            v-model="store.baby.condition"
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           >
             <option value="Sehat">Sehat</option>
@@ -183,8 +192,10 @@
             </svg>
           </div>
           <input
-            v-model="dateOfBirth"
+            v-if="store.baby"
+            v-model="store.baby.date_of_birth"
             type="datetime-local"
+            step="any"
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             placeholder="Select date"
           />
@@ -208,63 +219,40 @@
   </main>
 </template>
 
-<script>
-import { mapState } from "pinia";
+<script setup>
+import { useRoute } from "vue-router";
+import { onMounted } from "vue";
+import { storeToRefs } from "pinia";
 
-import { useMotherStore } from "@/stores/mother";
 import { useBabyStore } from "@/stores/baby";
+import { useMotherStore } from "@/stores/mother";
 
-const { addBaby } = useBabyStore();
+const route = useRoute();
+const store = useBabyStore();
+const { mothers } = storeToRefs(useMotherStore());
 const { fetchMothers } = useMotherStore();
-export default {
-  name: "AddBabyView",
-  computed: {
-    ...mapState(useBabyStore, ["error", "message"]),
-    ...mapState(useMotherStore, ["mothers"]),
-  },
-  async created() {
-    await fetchMothers();
-  },
-  data() {
-    return {
-      name: "",
-      gestationalAge: 0,
-      motherAge: 0,
-      length: 0,
-      weight: 0,
-      motherId: "",
-      gender: "Laki laki",
-      condition: "Sehat",
-      parturition: "Normal",
-      dateOfBirth: "",
-      errors: [],
-    };
-  },
-  methods: {
-    handleValidation() {
-      if (this.name !== "") {
-        this.errors.push("Nama wajib diisi");
-      }
+const babyId = route.params.id;
 
-      return this.errors.length <= 0;
-    },
-    async handleSubmit() {
-      const data = {
-        name: this.name,
-        gestational_age: this.gestationalAge,
-        mother_age: this.motherAge,
-        gender: this.gender,
-        length: this.length,
-        weight: this.weight,
-        date_of_birth: this.dateOfBirth,
-        mother_id: this.motherId,
-        condition: this.condition,
-        parturition: this.parturition,
-      };
-      await addBaby(data);
-    },
-  },
-};
+onMounted(async () => {
+  await fetchMothers();
+  await store.fetchBaby(babyId);
+});
+
+async function handleSubmit() {
+  const data = {
+    name: store.baby.name,
+    gestational_age: store.baby.gestational_age,
+    mother_age: store.baby.mother_age,
+    gender: store.baby.gender,
+    length: store.baby.length,
+    weight: store.baby.weight,
+    date_of_birth: store.baby.date_of_birth,
+    mother_id: store.baby.mother_id,
+    condition: store.baby.condition,
+    parturition: store.baby.parturition,
+  };
+  await store.updateBaby(babyId, data);
+}
 </script>
 
 <style scoped></style>

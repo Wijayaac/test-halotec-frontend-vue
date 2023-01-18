@@ -6,7 +6,6 @@
       <button class="mx-4" @click="handleDetail">Edit Selected</button>
       <button class="mx-4" @click="handleDelete">Delete Selected</button>
     </div>
-    <pre></pre>
     <DataTable
       :data="mothers"
       :columns="columns"
@@ -22,7 +21,7 @@
         </tr>
       </thead>
     </DataTable>
-    <div class="pagination">
+    <div class="pagination" v-if="meta.currentPage">
       <button class="mx-2" @click="handlePagination(meta.currentPage - 1)">
         Prev
       </button>
@@ -75,9 +74,9 @@ const columns = [
 
 DataTable.use(DataTablesLib);
 
-onMounted(() => {
+onMounted(async () => {
   dt = table.value.dt();
-  fetchMothers();
+  await fetchMothers(1);
 });
 
 function handleDetail() {
@@ -85,18 +84,19 @@ function handleDetail() {
   router.push(`/mother/${target}`);
 }
 
-function handleDelete() {
+async function handleDelete() {
   const target = dt.rows({ selected: true }).data()[0];
   const { id, name } = target;
 
   let isConfirmed = window.confirm(`Are you sure want to delete ${name}`);
   if (isConfirmed) {
-    deleteMother(id);
+    await deleteMother(id);
+    await fetchMothers(1);
   }
 }
 
-function handlePagination(page) {
-  fetchMothers(page);
+async function handlePagination(page) {
+  await fetchMothers(page);
 }
 </script>
 

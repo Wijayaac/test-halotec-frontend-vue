@@ -33,13 +33,17 @@
 
 <script setup>
 import { useRoute } from "vue-router";
+import { onMounted } from "vue";
 
 import { useMotherStore } from "@/stores/mother";
 
 const route = useRoute();
 const store = useMotherStore();
 const motherId = route.params.id;
-store.fetchMother(motherId);
+
+onMounted(async () => {
+  store.fetchMother(motherId);
+});
 
 function handleSubmit() {
   const data = {

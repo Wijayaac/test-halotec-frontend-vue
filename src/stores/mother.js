@@ -15,19 +15,24 @@ export const useMotherStore = defineStore({
     },
   }),
   actions: {
-    fetchMothers: async function (currentPage = 1) {
+    fetchMothers: async function (currentPage = null) {
       this.mothers = [];
       this.meta = {
         total: 0,
         currentPage: currentPage,
       };
       this.loading = true;
+      let queryString = "";
+
+      if (currentPage) {
+        queryString += `?page=${currentPage}`;
+      }
 
       try {
         const { data } = await axios.get(
-          `${import.meta.env.VITE_API_URL}/mothers?page=${currentPage}`
+          `${import.meta.env.VITE_API_URL}/mothers${queryString}`
         );
-        this.mothers = data.mothers.data;
+        this.mothers = data.mothers.data || data.mothers;
         this.meta = {
           currentPage: data.mothers.current_page,
           total: data.mothers.total,

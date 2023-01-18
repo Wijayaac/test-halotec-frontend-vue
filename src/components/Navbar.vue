@@ -72,7 +72,6 @@ export default {
           children: [
             { name: "Babies", link: "/babies" },
             { name: "Add Baby", link: "/baby/add" },
-            { name: "Dashboard 4", link: "/" },
           ],
         },
         {
@@ -80,7 +79,6 @@ export default {
           children: [
             { name: "Mothers", link: "/mothers" },
             { name: "Add Mother", link: "/mother/add" },
-            { name: "Dashboard 4", link: "/" },
           ],
         },
         { name: "Logout", link: "/" },
