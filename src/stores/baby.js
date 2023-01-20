@@ -1,5 +1,14 @@
 import { defineStore } from "pinia";
 import axios from "axios";
+import isEmpty from "lodash.isempty";
+
+function getGestationalLabel(data) {
+  return data.map((period) => period.label);
+}
+
+function getGestationalTotal(data) {
+  return data.map((period) => period.average);
+}
 
 export const useBabyStore = defineStore({
   id: "baby",
@@ -17,6 +26,70 @@ export const useBabyStore = defineStore({
       message: null,
       error: null,
     };
+  },
+  getters: {
+    conditionData(state) {
+      const label = "Kelahiran bayi berdasarkan kondisi";
+      if (isEmpty(state.statistics.condition)) {
+        return;
+      }
+      return {
+        labels: Object.keys(state.statistics.condition),
+        datasets: [
+          {
+            label: label,
+            backgroundColor: ["#ffc300", "#41B883", "#ff4f4f"],
+            data: Object.values(state.statistics.condition),
+          },
+        ],
+      };
+    },
+    gestationalData(state) {
+      const label = "Usia Kehamilan (Berdasarkan Bulan)";
+      if (isEmpty(state.statistics.gestational_age)) {
+        return;
+      }
+      return {
+        labels: getGestationalLabel(state.statistics.gestational_age),
+        datasets: [
+          {
+            label: label,
+            backgroundColor: "#f87979",
+            data: getGestationalTotal(state.statistics.gestational_age),
+          },
+        ],
+      };
+    },
+    genderData(state) {
+      if (isEmpty(state.statistics.gender)) {
+        return;
+      }
+      return {
+        labels: Object.keys(state.statistics.gender),
+        datasets: [
+          {
+            backgroundColor: ["#3291f6", "#ff5bbd"],
+            data: Object.values(state.statistics.gender),
+          },
+        ],
+      };
+    },
+    parturitionData(state) {
+      const label = "Proses Kelahiran Bayi";
+      if (isEmpty(state.statistics.parturition)) {
+        return;
+      }
+      return {
+        labels: Object.keys(state.statistics.parturition),
+        datasets: [
+          {
+            label: label,
+            backgroundColor: ["#f58585", "#c4ff46", "#774aff", "#ff6c4b"],
+            data: Object.values(state.statistics.parturition),
+          },
+        ],
+      };
+    },
   },
   actions: {
     addBaby: async function (formBody) {

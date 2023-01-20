@@ -1,13 +1,13 @@
 <template>
   <div>
-    <p v-if="loading">Loading Data ...</p>
-    <p v-if="error">{{ error.message }}</p>
-    <div v-if="statistics">
+    <p v-if="store.loading">Loading Data ...</p>
+    <p v-if="store.error">{{ store.error.message }}</p>
+    <div v-if="store.statistics">
       <div class="grid grid-cols-2 items-center">
         <h2 class="mb-5 md:mb-0">Filter Berdasarkan Tanggal</h2>
         <form
           class="grid grid-cols-3 gap-4 items-center"
-          @submit.prevent="handleSubmit"
+          @submit.prevent="handleFilterByDate"
         >
           <div class="mb-6">
             <label
@@ -55,38 +55,87 @@
         >
           <h5
             class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white"
-            v-if="statistics?.total"
+            v-if="store.statistics.total !== null"
           >
             Total bayi :
           </h5>
           <p
             class="mt-10 text-9xl text-center font-sans font-bold tracking-tight dark:text-white"
           >
-            {{ statistics.total }}
+            {{ store.statistics.total }}
           </p>
         </div>
         <div
+          v-if="store.genderData"
           class="block max-h-[300px] p-6 bg-white border border-gray-200 rounded-lg shadow-md hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700"
         >
-          <PieChart v-if="genderData" :chart-data="genderData" />
+          <PieChart :chart-data="store.genderData" />
         </div>
         <div
+          v-if="store.conditionData"
           class="block p-6 bg-white border border-gray-200 rounded-lg shadow-md hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700"
         >
-          <BarChart v-if="conditionData" :chart-data="conditionData" />
+          <BarChart :chart-data="store.conditionData" />
         </div>
         <div
+          v-if="store.parturitionData"
           class="block p-6 bg-white border border-gray-200 rounded-lg shadow-md hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700"
         >
-          <BarChart v-if="parturitionData" :chart-data="parturitionData" />
+          <BarChart :chart-data="store.parturitionData" />
         </div>
       </div>
-      <div class="grid">
+      <div class="grid grid-cols-2 items-center">
+        <h2 class="mb-5 md:mb-0">Filter Usia Kandungan</h2>
+        <form
+          class="grid grid-cols-3 gap-4 items-center"
+          @submit.prevent="handleFilterByDate"
+        >
+          <div class="mb-6">
+            <label
+              for="start-date"
+              class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >
+              Tahun
+            </label>
+            <input
+              id="start-date"
+              type="date"
+              v-model="form.year"
+              placeholder="Tanggal Awal"
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            />
+          </div>
+          <div class="mb-6">
+            <label
+              for="end-date"
+              class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >
+              Bulan
+            </label>
+            <input
+              id="end-date"
+              type="date"
+              v-model="form.month"
+              placeholder="Tanggal Awal"
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            />
+          </div>
+          <div class="">
+            <button
+              type="submit"
+              class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            >
+              Filter
+            </button>
+          </div>
+        </form>
+      </div>
+      <div v-if="store.gestationalData" class="grid">
         <div class="border-t-2 border-orange-400 mt-5 pt-5">
           <div
             class="block p-6 bg-white border border-gray-200 rounded-lg shadow-md hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700"
           >
-            <LineChart v-if="gestationalData" :chart-data="gestationalData" />
+            <LineChart :chart-data="store.gestationalData" />
           </div>
         </div>
       </div>
@@ -99,9 +148,7 @@ import { useBabyStore } from "@/stores/baby";
 import PieChart from "@/components/PieChart.vue";
 import BarChart from "@/components/BarChart.vue";
 import LineChart from "@/components/LineChart.vue";
-import { mapState } from "pinia";
 
-let store;
 export default {
   name: "HomeView",
   components: {
@@ -110,77 +157,26 @@ export default {
     PieChart,
   },
   setup() {
-    store = useBabyStore();
+    const store = useBabyStore();
+    return { store };
   },
   data() {
     return {
-      conditionData: null,
-      gestationalData: null,
-      genderData: null,
-      parturitionData: null,
-      store: null,
       form: {
         startDate: null,
         endDate: null,
+        year: null,
+        month: null,
       },
     };
   },
-  computed: {
-    ...mapState(useBabyStore, ["loading", "statistics", "error"]),
-  },
   async mounted() {
-    await store.fetchBabies();
-    await store.fetchStatistics("year=2024&month=02");
-    await store.fetchStatistics("from=2022-01-12");
-    this.conditionData = {
-      labels: Object.keys(this.statistics.condition),
-      datasets: [
-        {
-          label: "Kelahiran bayi berdasarkan kondisi",
-          backgroundColor: ["#ffc300", "#41B883", "#ff4f4f"],
-          data: Object.values(this.statistics.condition),
-        },
-      ],
-    };
-
-    this.gestationalData = {
-      labels: this.getGestationalLabel(this.statistics.gestational_age),
-      datasets: [
-        {
-          label: "Usia Kehamilan (Bulan)",
-          backgroundColor: "#f87979",
-          data: this.getGestationalTotal(this.statistics.gestational_age),
-        },
-      ],
-    };
-    this.genderData = {
-      labels: Object.keys(this.statistics.gender),
-      datasets: [
-        {
-          backgroundColor: ["#3291f6", "#ff5bbd"],
-          data: Object.values(this.statistics.gender),
-        },
-      ],
-    };
-    this.parturitionData = {
-      labels: Object.keys(this.statistics.parturition),
-      datasets: [
-        {
-          label: "Proses Kelahiran Bayi",
-          backgroundColor: ["#f58585", "#c4ff46", "#774aff", "#ff6c4b"],
-          data: Object.values(this.statistics.parturition),
-        },
-      ],
-    };
+    await this.store.fetchBabies();
+    await this.store.fetchStatistics("year=2024&month=02");
+    await this.store.fetchStatistics("from=2022-01-12");
   },
   methods: {
-    getGestationalLabel: (data) => {
-      return data.map((period) => period.label);
-    },
-    getGestationalTotal: (data) => {
-      return data.map((period) => period.average);
-    },
-    handleSubmit: async function () {
+    handleFilterByDate: async function () {
       let query = `from=${this.form.startDate}`;
       if (this.form.startDate === null) {
         return;
@@ -189,10 +185,7 @@ export default {
         query += `&to=${this.form.endDate}`;
       }
 
-      await store.fetchStatistics(query);
-
-      this.form.startDate = null;
-      this.form.endDate = null;
+      await this.store.fetchStatistics(query);
     },
   },
 };
