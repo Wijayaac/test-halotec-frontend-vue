@@ -1,5 +1,5 @@
 <template>
-  <main>
+  <div>
     <div class="max-w-2xl ml-4">
       <form @submit.prevent="handleSubmit">
         <div class="mb-6">
@@ -205,7 +205,7 @@
         </div>
       </div>
     </div>
-  </main>
+  </div>
 </template>
 
 <script>

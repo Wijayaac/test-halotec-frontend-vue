@@ -23,3 +23,8 @@
         @apply overflow-x-hidden;
     }
 }
+
+
+.page-wrapper {
+    @apply container mx-auto px-6 my-8;
+}

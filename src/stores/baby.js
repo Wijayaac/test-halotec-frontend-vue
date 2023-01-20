@@ -3,18 +3,21 @@ import axios from "axios";
 
 export const useBabyStore = defineStore({
   id: "baby",
-  state: () => ({
-    babies: [],
-    baby: null,
-    meta: {
-      currentPage: 1,
-      total: 0,
-      perPage: 0,
-    },
-    loading: false,
-    message: null,
-    error: null,
-  }),
+  state: () => {
+    return {
+      babies: [],
+      baby: null,
+      loading: false,
+      metaData: {
+        currentpage: 1,
+        total: 0,
+        perPage: 2,
+      },
+      statistics: {},
+      message: null,
+      error: null,
+    };
+  },
   actions: {
     addBaby: async function (formBody) {
       this.loading = true;
@@ -44,10 +47,6 @@ export const useBabyStore = defineStore({
     },
     fetchBabies: async function (currentPage = null) {
       this.babies = [];
-      this.meta = {
-        total: 0,
-        currentPage: currentPage,
-      };
       this.loading = true;
       let queryString = "";
 
@@ -62,7 +61,7 @@ export const useBabyStore = defineStore({
           `${import.meta.env.VITE_API_URL}/babies${queryString}`
         );
         this.babies = babies;
-        this.meta = meta;
+        this.metaData = meta;
       } catch (error) {
         this.error = error;
       } finally {
@@ -77,6 +76,24 @@ export const useBabyStore = defineStore({
           data: { data },
         } = await axios.get(`${import.meta.env.VITE_API_URL}/babies/${babyId}`);
         this.baby = data;
+      } catch (error) {
+        this.error = error;
+      } finally {
+        this.loading = false;
+      }
+    },
+    fetchStatistics: async function (query) {
+      this.loading = true;
+
+      try {
+        const {
+          data: { meta, message },
+        } = await axios.get(
+          `${import.meta.env.VITE_API_URL}/babies/statistics?${query}`
+        );
+        for (const prop in meta) {
+          this.statistics[prop] = meta[prop];
+        }
       } catch (error) {
         this.error = error;
       } finally {

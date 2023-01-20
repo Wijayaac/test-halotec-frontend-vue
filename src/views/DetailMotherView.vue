@@ -1,5 +1,5 @@
 <template>
-  <main>
+  <div>
     <p v-if="store.loading">...Loading Form</p>
     <div class="max-w-2xl ml-4">
       <form @submit.prevent="handleSubmit">

@@ -1,5 +1,5 @@
 <template>
-  <main>
+  <div>
     <p v-if="loading">Loading mothers ...</p>
     <p v-if="error">{{ error.message }}</p>
     <div class="action">
@@ -37,7 +37,7 @@
         Next
       </button>
     </div>
-  </main>
+  </div>
 </template>
 
 <script setup>
